@@ -30,6 +30,14 @@ public class AuthorService {
             throw new RuntimeException("An unexpected error occurred: " + e.getMessage(), e);
         }
     }
+    
+    public List<Author> getAuthorByName(String name) {
+    	try {
+    		return authorRepository.findByName(name);
+    	} catch (Exception e) {
+            throw new RuntimeException("An unexpected error occurred: " + e.getMessage(), e);
+        }
+    }
 
     public Author createAuthor(Author author) {
     	try {

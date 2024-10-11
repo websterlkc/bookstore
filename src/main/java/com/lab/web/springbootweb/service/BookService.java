@@ -3,16 +3,20 @@ package com.lab.web.springbootweb.service;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.lab.web.springbootweb.domain.Author;
 import com.lab.web.springbootweb.domain.Book;
 import com.lab.web.springbootweb.repository.AuthorRepository;
 import com.lab.web.springbootweb.repository.BookRepository;
 
 @Service
 public class BookService {
+    private static final Logger logger = LoggerFactory.getLogger(BookService.class);
 
     @Autowired
     private BookRepository bookRepository;
@@ -27,13 +31,19 @@ public class BookService {
         } catch (Exception e) {
             throw new RuntimeException("An unexpected error occurred: " + e.getMessage(), e);
         }
-    }
-    
-    
+    }    
 
     public Book getBookById(String isbn) {    
         try {
-            return bookRepository.findByIsbn(isbn);
+        	return bookRepository.findByIsbn(isbn);
+        } catch (Exception e) {
+            throw new RuntimeException("An unexpected error occurred: " + e.getMessage(), e);
+        }
+    }
+    
+    public List<Book> getBookByTitle(String title) {    
+        try {
+            return bookRepository.findByTitle(title);
         } catch (Exception e) {
             throw new RuntimeException("An unexpected error occurred: " + e.getMessage(), e);
         }

@@ -1,8 +1,10 @@
 package com.lab.web.springbootweb.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -22,7 +24,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lab.web.springbootweb.domain.Author;
 import com.lab.web.springbootweb.domain.Book;
+import com.lab.web.springbootweb.service.AuthorService;
 import com.lab.web.springbootweb.service.BookService;
 
 @RestController
@@ -36,6 +40,9 @@ public class BookController extends BaseController {
 
     @Autowired
     private BookService bookService;
+    
+    @Autowired
+    private AuthorService authorService;
 
     // Get all books
     @GetMapping("/getAllBooks")
@@ -62,6 +69,53 @@ public class BookController extends BaseController {
         Book book = bookService.getBookById(isbn);
         if (book != null) {
             response.put("book", book);
+            response.put("message", "Book retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            response.put("message", "Book not found.");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+    }
+    
+    // Get a book by ISBN using a query parameter
+    @GetMapping("/searchTitleAndAuthor")
+	public @ResponseBody ResponseEntity<Map<String, Object>> getBookByTitle(
+	        HttpServletRequest request,
+	        @RequestParam(value = "title", required = false) String title,  // `required = false` makes it optional
+	        @RequestParam(value = "author_name", required = false) String authorName) {
+
+    	if (!authenticate(request)) {
+            return new ResponseEntity<>(createResponse("Invalid request", null), HttpStatus.FORBIDDEN);
+        }
+    	
+        Map<String, Object> response = new HashMap<>();
+    	if(StringUtils.isEmpty(title) && StringUtils.isEmpty(authorName)) {
+    		response.put("message", "Missing Params");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    	    	
+        List<Book> bookList = bookService.getBookByTitle(title);        
+        
+        List<Author> authorList = authorService.getAuthorByName(authorName);
+        List<Book> newBookList = new ArrayList<Book>();
+        if(authorList!=null && !authorList.isEmpty()) {
+        	for(Author author : authorList) {
+        		newBookList.addAll(author.getBooks());
+        	}
+        	
+            if(newBookList!=null && !newBookList.isEmpty()) {
+            	bookList.addAll(newBookList);
+            }
+        }
+        
+        bookList = bookList.stream().collect(Collectors.toMap(
+            Book::getBid,     // Use `bid` as the key
+            book -> book,     // The value is the book object itself
+            (existing, replacement) -> existing)) // If there's a duplicate, keep the existing one
+        		.values().stream().collect(Collectors.toList());
+
+        if (bookList != null) {
+            response.put("bookList", bookList);
             response.put("message", "Book retrieved successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {

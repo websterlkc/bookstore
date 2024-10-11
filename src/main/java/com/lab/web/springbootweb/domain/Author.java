@@ -2,14 +2,19 @@ package com.lab.web.springbootweb.domain;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "Author", schema="BOOKSTORE")
@@ -32,6 +37,10 @@ public class Author implements Serializable {
 	
 	@Column(name = "isbn")
 	private String isbn;
+	
+	@ManyToMany(mappedBy = "authors", fetch = FetchType.LAZY)
+	@JsonBackReference // Add this annotation
+    private List<Book> books;
 
 	public Long getAuthorId() {
 		return authorId;
@@ -64,4 +73,12 @@ public class Author implements Serializable {
 	public void setIsbn(String isbn) {
 		this.isbn = isbn;
 	}
+
+	public List<Book> getBooks() {
+		return books;
+	}
+
+	public void setBooks(List<Book> books) {
+		this.books = books;
+	}	
 }

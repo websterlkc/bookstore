@@ -1,12 +1,17 @@
 package com.lab.web.springbootweb.domain;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -37,6 +42,14 @@ public class Book implements Serializable {
 
 	@Column(name = "price")
 	private double price;	
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "book_author",  // Join table name
+        joinColumns = @JoinColumn(name = "book_id"),  // Foreign key for Book
+        inverseJoinColumns = @JoinColumn(name = "author_id")  // Foreign key for Author
+    )
+    private List<Author> authors;
 
 	public Long getBid() {
 		return bid;
@@ -84,6 +97,14 @@ public class Book implements Serializable {
 
 	public void setGenre(String genre) {
 		this.genre = genre;
+	}
+
+	public List<Author> getAuthors() {
+		return authors;
+	}
+
+	public void setAuthors(List<Author> authors) {
+		this.authors = authors;
 	}
 
 }
