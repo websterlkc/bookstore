@@ -79,7 +79,7 @@ public class BookController extends BaseController {
     
     // Get a book by ISBN using a query parameter
     @GetMapping("/searchTitleAndAuthor")
-	public @ResponseBody ResponseEntity<Map<String, Object>> getBookByTitle(
+	public @ResponseBody ResponseEntity<Map<String, Object>> getBookByTitleAndOrAuthorName(
 	        HttpServletRequest request,
 	        @RequestParam(value = "title", required = false) String title,  // `required = false` makes it optional
 	        @RequestParam(value = "author_name", required = false) String authorName) {
